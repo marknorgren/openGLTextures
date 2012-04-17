@@ -155,33 +155,34 @@ int generateSphere(float radius, int subdiv){
 			//triangle 1
 			sphere_normals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
 			sphere_verts[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
-			texcoords[k] = vec2(texCoordX+0,texCoordY+0);
+			//						s							t
+			texcoords[k] = vec2( (j+M_PI)/(2*M_PI), ( (i+(M_PI/2)) / (2*M_PI) ) );
 			k++;
 	
 			sphere_normals[k]= vec3(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step));
 			sphere_verts[k]=   vec4(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step), 1.0);
-			texcoords[k] = vec2(texCoordX+1/M_PI,texCoordY+0);
+			texcoords[k] = vec2( (j+M_PI)/(2*M_PI), ( ((i+step)+(M_PI/2)) / (2*M_PI) ) );
 			k++;
 			
 			sphere_normals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
 			sphere_verts[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
-			texcoords[k] = vec2(texCoordX+1/M_PI,texCoordY+1/(M_PI/2));
+			texcoords[k] = vec2( ((j+step) + M_PI)/(2*M_PI), ( ((i+step)+(M_PI/2)) / (2*M_PI) ) );
 			k++;
 
 			//triangle 2
 			sphere_normals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
 			sphere_verts[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
-			texcoords[k] = vec2(texCoordX+0,texCoordY+0);
+			texcoords[k] = vec2( ((j+step) + M_PI)/(2*M_PI), ( ((i+step)+(M_PI/2)) / (2*M_PI) ) );
 			k++;
 
 			sphere_normals[k]= vec3(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i));
 			sphere_verts[k]=   vec4(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i), 1.0);
-			texcoords[k] = vec2(texCoordX+1/M_PI,texCoordY+1/(M_PI/2));
+			texcoords[k] = vec2( ((j+step) + M_PI)/(2*M_PI), ( ((i)+(M_PI/2)) / (2*M_PI) ) );
 			k++;
 
 			sphere_normals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
 			sphere_verts[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
-			texcoords[k] = vec2(texCoordX+0,texCoordY+1/(M_PI/2));
+			texcoords[k] = vec2( ((j) + M_PI)/(2*M_PI), ( ((i)+(M_PI/2)) / (2*M_PI) ) );
 			k++;
 		}
 	}
@@ -211,7 +212,10 @@ void display(void)
 	glUniform4fv(ambient_light, 1, vec4(.5, .5, .5, 5));
 
 	if(mode == 0){
+		glActiveTexture(GL_TEXTURE0);
+		
 		glBindVertexArray( vao[0] );
+		glBindTexture(GL_TEXTURE_2D, texName[0]);
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
 	}else{
 		glBindVertexArray(0);
@@ -320,6 +324,7 @@ void init() {
 
   /*select clearing (background) color*/
   glClearColor(1.0, 1.0, 1.0, 1.0);
+  glEnable(GL_DEPTH_TEST);
 
 
   //populate our arrays
@@ -334,7 +339,7 @@ void init() {
     program1 = InitShader( "vshader-lighting.glsl", "fshader-lighting.glsl" );
 	program2 = InitShader( "vshader-phongshading.glsl", "fshader-phongshading.glsl" );
 	program3 = InitShader( "vshader-celshading.glsl", "fshader-celshading.glsl" );
-    glUseProgram(0 );
+    glUseProgram(program );
 
 	// Create a vertex array object
     glGenVertexArrays( 1, &vao[0] );
@@ -347,12 +352,12 @@ void init() {
 	
 
 	//and now our colors for each vertex
-	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec3), sphere_normals, GL_STATIC_DRAW );
+	//glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
+	//glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec3), sphere_normals, GL_STATIC_DRAW );
 
 	/* TEXTURE SETUP */
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
-	glBufferData( GL_ARRAY_BUFFER, sizeof(texcoords), texcoords, GL_STATIC_DRAW);
+	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec2), texcoords, GL_STATIC_DRAW);
 
 	ILuint ilTexID[3]; /* ILuint is a 32bit unsigned integer.
     //Variable texid will be used to store image name. */
@@ -405,6 +410,22 @@ void init() {
 
   //Only draw the things in the front layer
 	glEnable(GL_DEPTH_TEST);
+	model_view = glGetUniformLocation(program, "model_view");
+	projection = glGetUniformLocation(program, "projection");
+	
+	texMap = glGetUniformLocation(program, "texture");
+	glUniform1i(texMap, 0);//assign this one to texture unit 0
+
+
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+	vPosition = glGetAttribLocation(program, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
+	texCoord = glGetAttribLocation(program, "texCoord");
+	glEnableVertexAttribArray(texCoord);
+	glVertexAttribPointer(texCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 int main(int argc, char **argv)
