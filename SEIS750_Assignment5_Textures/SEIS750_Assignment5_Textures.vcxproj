@@ -44,6 +44,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -63,9 +64,11 @@
     <None Include="fshader-celshading.glsl" />
     <None Include="fshader-lighting.glsl" />
     <None Include="fshader-phongshading.glsl" />
+    <None Include="fshader-texture.glsl" />
     <None Include="vshader-celshading.glsl" />
     <None Include="vshader-lighting.glsl" />
     <None Include="vshader-phongshading.glsl" />
+    <None Include="vshader-texture.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InitShader.cpp" />
