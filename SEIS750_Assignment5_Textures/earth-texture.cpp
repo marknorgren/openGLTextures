@@ -156,33 +156,33 @@ int generateSphere(float radius, int subdiv){
 			sphere_normals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
 			sphere_verts[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
 			//						s							t
-			texcoords[k] = vec2( (j+M_PI)/(2*M_PI), ( (i+(M_PI/2)) / (2*M_PI) ) );
+			texcoords[k] = vec2( (j+M_PI)/(2*M_PI), ( (i+(M_PI/2)) / (M_PI) ) );
 			k++;
 	
 			sphere_normals[k]= vec3(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step));
 			sphere_verts[k]=   vec4(radius*sin(j)*cos(i+step), radius*cos(j)*cos(i+step), radius*sin(i+step), 1.0);
-			texcoords[k] = vec2( (j+M_PI)/(2*M_PI), ( ((i+step)+(M_PI/2)) / (2*M_PI) ) );
+			texcoords[k] = vec2( (j+M_PI)/(2*M_PI), ( ((i+step)+(M_PI/2)) / (M_PI) ) );
 			k++;
 			
 			sphere_normals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
 			sphere_verts[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
-			texcoords[k] = vec2( ((j+step) + M_PI)/(2*M_PI), ( ((i+step)+(M_PI/2)) / (2*M_PI) ) );
+			texcoords[k] = vec2( ((j+step) + M_PI)/(2*M_PI), ( ((i+step)+(M_PI/2)) / (M_PI) ) );
 			k++;
 
 			//triangle 2
 			sphere_normals[k]= vec3(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step));
 			sphere_verts[k]=   vec4(radius*sin((j+step))*cos((i+step)), radius*cos(j+step)*cos(i+step), radius*sin(i+step), 1.0);
-			texcoords[k] = vec2( ((j+step) + M_PI)/(2*M_PI), ( ((i+step)+(M_PI/2)) / (2*M_PI) ) );
+			texcoords[k] = vec2( ((j+step) + M_PI)/(2*M_PI), ( ((i+step)+(M_PI/2)) / (M_PI) ) );
 			k++;
 
 			sphere_normals[k]= vec3(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i));
 			sphere_verts[k]=   vec4(radius*sin(j+step)*cos(i), radius*cos(j+step)*cos(i), radius*sin(i), 1.0);
-			texcoords[k] = vec2( ((j+step) + M_PI)/(2*M_PI), ( ((i)+(M_PI/2)) / (2*M_PI) ) );
+			texcoords[k] = vec2( ((j+step) + M_PI)/(2*M_PI), ( ((i)+(M_PI/2)) / (M_PI) ) );
 			k++;
 
 			sphere_normals[k]= vec3(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i));
 			sphere_verts[k]=   vec4(radius*sin(j)*cos(i), radius*cos(j)*cos(i), radius*sin(i), 1.0);
-			texcoords[k] = vec2( ((j) + M_PI)/(2*M_PI), ( ((i)+(M_PI/2)) / (2*M_PI) ) );
+			texcoords[k] = vec2( ((j) + M_PI)/(2*M_PI), ( ((i)+(M_PI/2)) / (M_PI) ) );
 			k++;
 		}
 	}

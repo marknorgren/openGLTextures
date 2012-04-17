@@ -27,8 +27,6 @@ main()
 	SpecularExponent = vSpecularExponent;
 	
 	vec4 veyepos = model_view*vPosition;
-	
-
 
 	vN = normalize(model_view * vNormal).xyz;
 	
