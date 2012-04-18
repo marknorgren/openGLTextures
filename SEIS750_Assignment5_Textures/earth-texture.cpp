@@ -32,6 +32,7 @@ GLuint model_view;
 GLuint projection;
 
 GLuint vPosition;
+GLuint vTexCoord;
 GLuint texCoord;
 GLuint texMap;
 
@@ -253,9 +254,9 @@ void setupShader(GLuint prog){
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
-	vNormal = glGetAttribLocation(prog, "texCoord");
-	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	vTexCoord = glGetAttribLocation(prog, "texCoord");
+	glEnableVertexAttribArray(vTexCoord);
+	glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 
@@ -332,7 +333,7 @@ void init() {
 
 
   //populate our arrays
-  spherevertcount = generateSphere(2, 30);
+  spherevertcount = generateSphere(3, 40);
 
 
   //vec2 texcoords[spherevertcount];
@@ -369,6 +370,7 @@ void init() {
 	ilInit(); /* Initialization of OpenIL */
 	ilGenImages(3, ilTexID); /* Generation of three image names for OpenIL image loading */
 	glGenTextures(3, texName); //and we eventually want the data in an OpenGL texture
+
  
 
 
@@ -376,16 +378,22 @@ void init() {
 	loadTexFile("images/Earth.png");
 	glBindTexture(GL_TEXTURE_2D, texName[0]); //bind OpenGL texture name
 
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   
    //Note how we depend on OpenIL to supply information about the file we just loaded in
    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),0,
 	   ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData());
-   /*
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+   glGenerateMipmap(GL_TEXTURE_2D);
+
+   
+   
 	//Now repeat the process for the second image
 	ilBindImage(ilTexID[1]);
 	glBindTexture(GL_TEXTURE_2D, texName[1]);
-	loadTexFile("images/alpaca.png");
+	loadTexFile("images/EarthSpec.png");
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
