@@ -202,8 +202,7 @@ void display(void)
     mv = LookAt(vec4(0, 0, 10+z_distance, 1.0), vec4(0, 0, 0, 1.0), vec4(0, 1, 0, 0.0));
 	
 	mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
-	mv = mv * RotateZ(globe_revolution);
-	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
+	
 	
 	glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
 	glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
@@ -211,6 +210,9 @@ void display(void)
 	glUniform4fv(light_position, 1, mv*vec4(90, 90, 90, 1));
 	glUniform4fv(light_color, 1, vec4(1,1,1,1));
 	glUniform4fv(ambient_light, 1, vec4(.2, .2, .2, 5));
+
+	mv = mv * RotateZ(globe_revolution);
+	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
 	if(mode == 0){
 		

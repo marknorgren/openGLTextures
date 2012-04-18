@@ -35,6 +35,14 @@ void main()
 
 	vec3 H = normalize(L+E);
 	vec4 amb = AmbientDiffuseColor * ambient_light;
+	if(dot(L,N) < 0.0){
+			
+			amb = vec4(0.0,0.0,0.0,1.0);
+		}
+		else
+		{
+			
+		}
 	vec4 diff = max(dot(L,N), 0.0) * AmbientDiffuseColor * light_color;
 	vec4 spec = pow( max (dot(N,H), 0.0), SpecularExponent) *  SpecularColor * light_color;
 	if(dot(L,N) < 0.0){
