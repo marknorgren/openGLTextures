@@ -101,6 +101,7 @@ int prevMouseY;
 double view_rotx = 0.0;
 double view_roty = 0.0;
 double view_rotz = 0.0;
+double globe_revolution = 0.0;
 double z_distance;
 
 
@@ -197,9 +198,9 @@ void display(void)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     mv = LookAt(vec4(0, 0, 10+z_distance, 1.0), vec4(0, 0, 0, 1.0), vec4(0, 1, 0, 0.0));
-
+	
 	mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
-
+	mv = mv * RotateZ(globe_revolution);
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 	
 	glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
@@ -380,7 +381,6 @@ void init() {
    //Note how we depend on OpenIL to supply information about the file we just loaded in
    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),0,
 	   ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData());
-
    /*
 	//Now repeat the process for the second image
 	ilBindImage(ilTexID[1]);
@@ -394,7 +394,7 @@ void init() {
 
 
 	//And the third image
-
+	/*
 	ilBindImage(ilTexID[2]);
 	glBindTexture(GL_TEXTURE_2D, texName[2]);
 	loadTexFile("images/opengl.png");
@@ -403,7 +403,7 @@ void init() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),0,
 	   ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData());
-	   */
+	*/
     ilDeleteImages(3, ilTexID); //we're done with OpenIL, so free up the memory
 
 	glEnable(GL_BLEND);
@@ -431,6 +431,13 @@ void init() {
 	glVertexAttribPointer(texCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
+void my_timer (int v)
+	{
+		globe_revolution+=0.3;
+		glutPostRedisplay();
+		glutTimerFunc(1000/v, my_timer, v);
+	}
+
 int main(int argc, char **argv)
 {
   /*set up window for display*/
@@ -451,7 +458,7 @@ int main(int argc, char **argv)
   //glutIdleFunc(idle);
   glutMouseFunc(mouse);
   glutMotionFunc(mouse_dragged);
-
+  glutTimerFunc(500,my_timer,60);
   glutMainLoop();
   return 0;
 }
