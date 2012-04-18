@@ -202,14 +202,12 @@ void display(void)
 
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 	
-	
-
 	glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
 	glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
 	glVertexAttrib1f(vSpecularExponent, 10.0);
-	glUniform4fv(light_position, 1, mv*vec4(50, 50, 50, 1));
+	glUniform4fv(light_position, 1, mv*vec4(90, 90, 90, 1));
 	glUniform4fv(light_color, 1, vec4(1,1,1,1));
-	glUniform4fv(ambient_light, 1, vec4(.5, .5, .5, 5));
+	glUniform4fv(ambient_light, 1, vec4(.2, .2, .2, 5));
 
 	if(mode == 0){
 		glActiveTexture(GL_TEXTURE0);
@@ -252,6 +250,11 @@ void setupShader(GLuint prog){
 	vNormal = glGetAttribLocation(prog, "vNormal");
 	glEnableVertexAttribArray(vNormal);
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
+	vNormal = glGetAttribLocation(prog, "texCoord");
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 2, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 
@@ -328,7 +331,7 @@ void init() {
 
 
   //populate our arrays
-  spherevertcount = generateSphere(3, 30);
+  spherevertcount = generateSphere(2, 30);
 
 
   //vec2 texcoords[spherevertcount];
@@ -346,17 +349,17 @@ void init() {
 
     // Create and initialize any buffer objects
 	glBindVertexArray( vao[0] );
-	glGenBuffers( 2, &vbo[0] );
+	glGenBuffers( 3, &vbo[0] );
     glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
     glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec4), sphere_verts, GL_STATIC_DRAW);
 	
 
-	//and now our colors for each vertex
-	//glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
-	//glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec3), sphere_normals, GL_STATIC_DRAW );
+	//and now our normals for each vertex
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
+	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec3), sphere_normals, GL_STATIC_DRAW );
 
 	/* TEXTURE SETUP */
-	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
 	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec2), texcoords, GL_STATIC_DRAW);
 
 	ILuint ilTexID[3]; /* ILuint is a 32bit unsigned integer.
@@ -422,7 +425,7 @@ void init() {
 	glEnableVertexAttribArray(vPosition);
 	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
 	texCoord = glGetAttribLocation(program, "texCoord");
 	glEnableVertexAttribArray(texCoord);
 	glVertexAttribPointer(texCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
