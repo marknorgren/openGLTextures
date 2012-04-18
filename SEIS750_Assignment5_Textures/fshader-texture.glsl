@@ -11,6 +11,7 @@ uniform vec4 light_color;
 uniform vec4 ambient_light;
 
 uniform sampler2D texture;
+uniform sampler2D specMapTexture;
 
 out vec4  fColor;
 
@@ -24,6 +25,9 @@ void main()
 
 	AmbientDiffuseColor = texture2D(texture, fTexCoord);
 	AmbientDiffuseColor.w = 1.0;
+
+	SpecularColor = texture2D(specMapTexture, fTexCoord);
+	SpecularExponent = SpecularColor.w*155;
 
 	vec3 L = normalize( light_position.xyz - position.xyz);
 	vec3 E = normalize(-position.xyz);
@@ -41,5 +45,6 @@ void main()
 	//fColor = vec4( vN, 1);
 
 	//fColor = AmbientDiffuseColor;
+	//fColor = spec;
 
 }

@@ -35,6 +35,7 @@ GLuint vPosition;
 GLuint vTexCoord;
 GLuint texCoord;
 GLuint texMap;
+GLuint specMap;
 
 GLuint vAmbientDiffuseColor;
 GLuint vSpecularColor;
@@ -212,10 +213,12 @@ void display(void)
 	glUniform4fv(ambient_light, 1, vec4(.2, .2, .2, 5));
 
 	if(mode == 0){
-		glActiveTexture(GL_TEXTURE0);
 		
 		glBindVertexArray( vao[0] );
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texName[0]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texName[1]);
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
 	}else{
 		glBindVertexArray(0);
@@ -326,7 +329,7 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void init() {
-
+		
   /*select clearing (background) color*/
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glEnable(GL_DEPTH_TEST);
@@ -371,9 +374,6 @@ void init() {
 	ilGenImages(3, ilTexID); /* Generation of three image names for OpenIL image loading */
 	glGenTextures(3, texName); //and we eventually want the data in an OpenGL texture
 
- 
-
-
 	ilBindImage(ilTexID[0]); /* Binding of IL image name */
 	loadTexFile("images/Earth.png");
 	glBindTexture(GL_TEXTURE_2D, texName[0]); //bind OpenGL texture name
@@ -394,11 +394,14 @@ void init() {
 	ilBindImage(ilTexID[1]);
 	glBindTexture(GL_TEXTURE_2D, texName[1]);
 	loadTexFile("images/EarthSpec.png");
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	
 	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),0,
 	   ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData());
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+   glGenerateMipmap(GL_TEXTURE_2D);
 
 
 	//And the third image
@@ -426,6 +429,9 @@ void init() {
 	
 	texMap = glGetUniformLocation(program, "texture");
 	glUniform1i(texMap, 0);//assign this one to texture unit 0
+
+	specMap = glGetUniformLocation(program, "specMapTexture");
+	glUniform1i(specMap, 1); //assign this one to texture unit 1
 
 
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
