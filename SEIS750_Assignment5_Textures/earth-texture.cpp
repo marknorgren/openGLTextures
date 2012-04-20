@@ -203,9 +203,9 @@ void display(void)
 	glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
 	glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
 	glVertexAttrib1f(vSpecularExponent, 10.0);
-	glUniform4fv(light_position, 1, mv*vec4(90, 90, 90, 1));
+	glUniform4fv(light_position, 1, mv*vec4(90, 290, 90, 1));
 	glUniform4fv(light_color, 1, vec4(1,1,1,1));
-	glUniform4fv(ambient_light, 1, vec4(.5, .5, .5, 5));
+	glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
 
 	mv = mv * RotateZ(globe_revolution);
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);

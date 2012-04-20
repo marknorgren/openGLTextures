@@ -26,7 +26,7 @@ void main()
 
 
 	SpecularColor = texture2D(specMapTexture, fTexCoord);
-	SpecularExponent = SpecularColor.w*155;
+	SpecularExponent = SpecularColor.w*900;
 
 	vec3 L = normalize( light_position.xyz - position.xyz);
 	vec3 E = normalize(-position.xyz);
