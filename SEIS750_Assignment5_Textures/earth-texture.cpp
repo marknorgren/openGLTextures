@@ -33,8 +33,24 @@ enum textureNames {
 
 static GLuint texName[NUMBER_OF_TEXTURES];
 
-GLuint vao[1];
-GLuint vbo[3];
+
+enum vaoEnum {
+	EARTH_VAO,
+	CLOUDS_VAO,
+	NUMBER_OF_VAOS
+};
+GLuint vao[NUMBER_OF_VAOS];
+
+enum vboEnum {
+	GLOBE_VERTICIES,
+	GLOBE_NORMALS,
+	GLOBE_TEXTURE_COORDS,
+	CLOUD_VERTICIES,
+	CLOUD_NORMALS,
+	CLOUD_TEXTURE_COORDS,
+	NUMBER_OF_VBOS
+};
+GLuint vbo[NUMBER_OF_VBOS];
 
 //pointers to our shader variables
 GLuint model_view;
@@ -245,6 +261,7 @@ void display(void)
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
 
 
+		
 		glUseProgram(cloudsShader);
 		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
 		glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
@@ -252,7 +269,7 @@ void display(void)
 		glUniform4fv(light_position, 1, mv*vec4(90, 290, 90, 1));
 		glUniform4fv(light_color, 1, vec4(1,1,1,1));
 		glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
-		glBindVertexArray( vao[0] );
+		
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texName[0]);
 
@@ -261,10 +278,13 @@ void display(void)
 
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, texName[2]);
+
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, texName[CLOUDS_TEXTURE]);
-
+		
+		glBindVertexArray( vao[CLOUDS_VAO] );
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
+		
 
 	}else{
 		glBindVertexArray(0);
@@ -303,6 +323,38 @@ void setupShader(GLuint prog){
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
+	vTexCoord = glGetAttribLocation(prog, "texCoord");
+	glEnableVertexAttribArray(vTexCoord);
+	glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
+}
+
+void setupCloudShader(GLuint prog){
+
+	//glUseProgram( prog );
+	//glLinkProgram( prog);
+	model_view = glGetUniformLocation(prog, "model_view");
+	projection = glGetUniformLocation(prog, "projection");
+
+	vAmbientDiffuseColor = glGetAttribLocation(prog, "vAmbientDiffuseColor");
+	vSpecularColor = glGetAttribLocation(prog, "vSpecularColor");
+	vSpecularExponent = glGetAttribLocation(prog, "vSpecularExponent");
+	light_position = glGetUniformLocation(prog, "light_position");
+	light_color = glGetUniformLocation(prog, "light_color");
+	ambient_light = glGetUniformLocation(prog, "ambient_light");
+
+	glBindVertexArray( vao[CLOUDS_VAO] );
+
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[CLOUD_VERTICIES] );
+	vPosition = glGetAttribLocation(prog, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[CLOUD_NORMALS] );
+	vNormal = glGetAttribLocation(prog, "vNormal");
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[CLOUD_TEXTURE_COORDS] );
 	vTexCoord = glGetAttribLocation(prog, "texCoord");
 	glEnableVertexAttribArray(vTexCoord);
 	glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -380,11 +432,6 @@ void init() {
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glEnable(GL_DEPTH_TEST);
 
-
-	//populate our arrays
-	spherevertcount = generateSphere(3, 40);
-
-
 	//vec2 texcoords[spherevertcount];
 
 	// Load shaders and use the resulting shader program
@@ -396,8 +443,11 @@ void init() {
 	cloudsShader = InitShader( "vshader-texture.glsl", "fshader-clouds.glsl");
 	glUseProgram(program );
 
+	//populate our arrays
+	spherevertcount = generateSphere(3, 40);
+
 	// Create a vertex array object
-	glGenVertexArrays( 1, &vao[0] );
+	glGenVertexArrays( 2, &vao[0] );
 
 	// Create and initialize any buffer objects
 	glBindVertexArray( vao[0] );
@@ -405,13 +455,33 @@ void init() {
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
 	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec4), sphere_verts, GL_STATIC_DRAW);
 
-
 	//and now our normals for each vertex
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[1] );
 	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec3), sphere_normals, GL_STATIC_DRAW );
 
 	/* TEXTURE SETUP */
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
+	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec2), texcoords, GL_STATIC_DRAW);
+
+	/* CLOUDS SPHERE */
+	//populate our arrays
+	spherevertcount = generateSphere(3, 50);
+
+	// Create a vertex array object
+	//glGenVertexArrays( 1, &vao[CLOUDS_VAO] );
+
+	// Create and initialize any buffer objects
+	glBindVertexArray( vao[CLOUDS_VAO] );
+	glGenBuffers( 3, &vbo[CLOUD_VERTICIES] );
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[CLOUD_VERTICIES] );
+	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec4), sphere_verts, GL_STATIC_DRAW);
+
+	//and now our normals for each vertex
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[CLOUD_NORMALS] );
+	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec3), sphere_normals, GL_STATIC_DRAW );
+
+	/* TEXTURE SETUP */
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[CLOUD_TEXTURE_COORDS] );
 	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec2), texcoords, GL_STATIC_DRAW);
 
 	ILuint ilTexID[NUMBER_OF_TEXTURES]; /* ILuint is a 32bit unsigned integer.
@@ -521,7 +591,7 @@ void init() {
 	glVertexAttribPointer(texCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-	setupShader(cloudsShader);
+	setupCloudShader(cloudsShader);
 	setupShader(program);
 
 }
