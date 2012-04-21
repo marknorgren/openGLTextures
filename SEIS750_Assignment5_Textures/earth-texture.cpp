@@ -58,6 +58,8 @@ GLuint ambient_light;
 
 int multiflag = 0;
 
+void setupShader(GLuint prog);
+
 //Modified slightly from the OpenIL tutorials
 ILuint loadTexFile(const char* filename){
 
@@ -220,7 +222,13 @@ void display(void)
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
 	if(mode == 0){
-
+		glUseProgram(program);
+		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
+		glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
+		glVertexAttrib1f(vSpecularExponent, 10.0);
+		glUniform4fv(light_position, 1, mv*vec4(90, 290, 90, 1));
+		glUniform4fv(light_color, 1, vec4(1,1,1,1));
+		glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
 		glBindVertexArray( vao[0] );
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texName[0]);
@@ -235,6 +243,29 @@ void display(void)
 		glBindTexture(GL_TEXTURE_2D, texName[CLOUDS_TEXTURE]);
 
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
+
+
+		glUseProgram(cloudsShader);
+		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
+		glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
+		glVertexAttrib1f(vSpecularExponent, 10.0);
+		glUniform4fv(light_position, 1, mv*vec4(90, 290, 90, 1));
+		glUniform4fv(light_color, 1, vec4(1,1,1,1));
+		glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
+		glBindVertexArray( vao[0] );
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texName[0]);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texName[1]);
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, texName[2]);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, texName[CLOUDS_TEXTURE]);
+
+		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
+
 	}else{
 		glBindVertexArray(0);
 		glutSolidTeapot(2); //not very bandwidth efficient
@@ -247,7 +278,7 @@ void display(void)
 
 void setupShader(GLuint prog){
 
-	glUseProgram( prog );
+	//glUseProgram( prog );
 	//glLinkProgram( prog);
 	model_view = glGetUniformLocation(prog, "model_view");
 	projection = glGetUniformLocation(prog, "projection");
@@ -384,7 +415,7 @@ void init() {
 	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec2), texcoords, GL_STATIC_DRAW);
 
 	ILuint ilTexID[NUMBER_OF_TEXTURES]; /* ILuint is a 32bit unsigned integer.
-					   //Variable texid will be used to store image name. */
+										//Variable texid will be used to store image name. */
 
 	ilInit(); /* Initialization of OpenIL */
 	ilGenImages(NUMBER_OF_TEXTURES, ilTexID); /* Generation of three image names for OpenIL image loading */
@@ -425,7 +456,7 @@ void init() {
 	glBindTexture(GL_TEXTURE_2D, texName[2]);
 	loadTexFile("images/EarthNight.png");
 
-	
+
 
 	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),0,
 		ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData());
@@ -445,7 +476,7 @@ void init() {
 	glBindTexture(GL_TEXTURE_2D, texName[CLOUDS_TEXTURE]);
 	loadTexFile("images/earthcloudmap.png");
 
-	
+
 
 	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),0,
 		ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData());
@@ -460,8 +491,7 @@ void init() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	setupShader(program);
-	setupShader(cloudsShader);
+
 
 	//Only draw the things in the front layer
 	glEnable(GL_DEPTH_TEST);
@@ -489,6 +519,11 @@ void init() {
 	texCoord = glGetAttribLocation(program, "texCoord");
 	glEnableVertexAttribArray(texCoord);
 	glVertexAttribPointer(texCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	setupShader(cloudsShader);
+	setupShader(program);
+
 }
 
 void my_timer (int v)
