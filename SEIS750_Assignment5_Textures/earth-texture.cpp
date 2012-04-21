@@ -242,7 +242,8 @@ void display(void)
 		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
 		glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
 		glVertexAttrib1f(vSpecularExponent, 10.0);
-		glUniform4fv(light_position, 1, mv*vec4(90, 290, 90, 1));
+		vec4 lightPos_mv = mv*vec4(90, 290, 90, 1);
+		glUniform4fv(light_position, 1, lightPos_mv);
 		glUniform4fv(light_color, 1, vec4(1,1,1,1));
 		glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
 		glBindVertexArray( vao[0] );
@@ -261,12 +262,12 @@ void display(void)
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
 
 
-		
+		/*
 		glUseProgram(cloudsShader);
 		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
 		glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
 		glVertexAttrib1f(vSpecularExponent, 10.0);
-		glUniform4fv(light_position, 1, mv*vec4(90, 290, 90, 1));
+		glUniform4fv(light_position, 1, lightPos_mv);
 		glUniform4fv(light_color, 1, vec4(1,1,1,1));
 		glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
 		
@@ -284,6 +285,7 @@ void display(void)
 		
 		glBindVertexArray( vao[CLOUDS_VAO] );
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
+		*/
 		
 
 	}else{
