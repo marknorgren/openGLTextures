@@ -69,11 +69,11 @@ void main()
 	if(dot(L,N) < 0.0){
 		spec = vec4(0,0,0,1);
 	}
-	fColor = amb + diff + spec;
-	fColor.w = 1.0;
+	//fColor = amb + diff + spec;
+	//fColor.w = 1.0;
 
-	//fColor = texture2D(cloudsTexture, fTexCoord);
-	//fColor.w = 0.0;
+	fColor = texture2D(cloudsTexture, fTexCoord);
+	fColor.w = 0.5;
 	//fColor = vec4( vN, 1);
 		
 	//fColor = AmbientDiffuseColor;
