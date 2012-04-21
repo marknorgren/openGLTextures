@@ -20,9 +20,18 @@ int ww=800, wh=800;
 #define M_PI 3.14159265358979323846
 
 GLuint program, program1, program2, program3;
+GLuint cloudsShader;
 
 // Texture Files
-static GLuint texName[3];
+enum textureNames {
+	EARTH_TEXTURE,
+	EARTH_SPEC_TEXTURE,
+	EARTH_NIGHT_TEXTURE,
+	CLOUDS_TEXTURE,
+	NUMBER_OF_TEXTURES
+};
+
+static GLuint texName[NUMBER_OF_TEXTURES];
 
 GLuint vao[1];
 GLuint vbo[3];
@@ -37,6 +46,7 @@ GLuint texCoord;
 GLuint texMap;
 GLuint specMap;
 GLuint nightMap;
+GLuint cloudsTexture;
 
 GLuint vAmbientDiffuseColor;
 GLuint vSpecularColor;
@@ -45,7 +55,6 @@ GLuint vNormal;
 GLuint light_position;
 GLuint light_color;
 GLuint ambient_light;
-
 
 int multiflag = 0;
 
@@ -222,6 +231,9 @@ void display(void)
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, texName[2]);
 
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, texName[CLOUDS_TEXTURE]);
+
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
 	}else{
 		glBindVertexArray(0);
@@ -350,6 +362,7 @@ void init() {
 	program1 = InitShader( "vshader-lighting.glsl", "fshader-lighting.glsl" );
 	program2 = InitShader( "vshader-phongshading.glsl", "fshader-phongshading.glsl" );
 	program3 = InitShader( "vshader-celshading.glsl", "fshader-celshading.glsl" );
+	cloudsShader = InitShader( "vshader-texture.glsl", "fshader-clouds.glsl");
 	glUseProgram(program );
 
 	// Create a vertex array object
@@ -370,12 +383,12 @@ void init() {
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[2] );
 	glBufferData( GL_ARRAY_BUFFER, spherevertcount*sizeof(vec2), texcoords, GL_STATIC_DRAW);
 
-	ILuint ilTexID[3]; /* ILuint is a 32bit unsigned integer.
+	ILuint ilTexID[NUMBER_OF_TEXTURES]; /* ILuint is a 32bit unsigned integer.
 					   //Variable texid will be used to store image name. */
 
 	ilInit(); /* Initialization of OpenIL */
-	ilGenImages(3, ilTexID); /* Generation of three image names for OpenIL image loading */
-	glGenTextures(3, texName); //and we eventually want the data in an OpenGL texture
+	ilGenImages(NUMBER_OF_TEXTURES, ilTexID); /* Generation of three image names for OpenIL image loading */
+	glGenTextures(NUMBER_OF_TEXTURES, texName); //and we eventually want the data in an OpenGL texture
 
 	ilBindImage(ilTexID[0]); /* Binding of IL image name */
 	loadTexFile("images/Earth.png");
@@ -427,7 +440,28 @@ void init() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	//And the fourth image - CLOUDS
+	ilBindImage(ilTexID[CLOUDS_TEXTURE]);
+	glBindTexture(GL_TEXTURE_2D, texName[CLOUDS_TEXTURE]);
+	loadTexFile("images/earthcloudmap.png");
+
+	
+
+	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),0,
+		ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData());
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	ilDeleteImages(NUMBER_OF_TEXTURES, ilTexID); //we're done with OpenIL, so free up the memory
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	setupShader(program);
+	setupShader(cloudsShader);
 
 	//Only draw the things in the front layer
 	glEnable(GL_DEPTH_TEST);
@@ -442,6 +476,9 @@ void init() {
 
 	nightMap = glGetUniformLocation(program, "nightMapTexture");
 	glUniform1i(nightMap, 2); // assign this one to texture unit 2
+
+	cloudsTexture = glGetUniformLocation(program, "cloudsTexture");
+	glUniform1i(cloudsTexture, 3); // assign this one to texture unit 2
 
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
 	vPosition = glGetAttribLocation(program, "vPosition");

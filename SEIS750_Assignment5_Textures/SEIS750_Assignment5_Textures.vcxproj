@@ -62,6 +62,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="fshader-celshading.glsl" />
+    <None Include="fshader-clouds.glsl" />
     <None Include="fshader-lighting.glsl" />
     <None Include="fshader-phongshading.glsl" />
     <None Include="fshader-texture.glsl" />

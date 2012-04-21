@@ -13,7 +13,6 @@ uniform vec4 ambient_light;
 uniform sampler2D texture;
 uniform sampler2D specMapTexture;
 uniform sampler2D nightMapTexture;
-uniform sampler2D cloudsTexture;
 
 out vec4  fColor;
 
@@ -71,9 +70,6 @@ void main()
 	}
 	fColor = amb + diff + spec;
 	fColor.w = 1.0;
-
-	//fColor = texture2D(cloudsTexture, fTexCoord);
-	//fColor.w = 0.0;
 	//fColor = vec4( vN, 1);
 		
 	//fColor = AmbientDiffuseColor;
