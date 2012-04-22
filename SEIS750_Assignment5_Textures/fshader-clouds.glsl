@@ -73,7 +73,7 @@ void main()
 	//fColor.w = 1.0;
 
 	fColor = texture2D(cloudsTexture, fTexCoord);
-	fColor.w = 1.0;
+	//fColor.w = 1.0;
 	//fColor = vec4( vN, 1);
 		
 	//fColor = AmbientDiffuseColor;

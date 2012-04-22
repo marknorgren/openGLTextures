@@ -72,7 +72,7 @@ void main()
 	fColor = amb + diff + spec;
 	fColor.w = 1.0;
 
-	fColor = texture2D(cloudsTexture, fTexCoord);
+	//fColor = texture2D(cloudsTexture, fTexCoord);
 	//fColor.w = 0.0;
 	//fColor = vec4( vN, 1);
 		
