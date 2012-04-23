@@ -264,7 +264,9 @@ void display(void)
 		glBindVertexArray( vao[0] );
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
 
-		
+		mv = LookAt(vec4(0, 0, 10+z_distance, 1.0), vec4(0, 0, 0, 1.0), vec4(0, 1, 0, 0.0));
+
+	mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
 		setupCloudShader(cloudsShader);
 		//glUseProgram(cloudsShader);
 		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
@@ -465,7 +467,7 @@ void init() {
 
 	/* CLOUDS SPHERE */
 	//populate our arrays
-	cloudSphereCount = generateSphere(3, 50);
+	cloudSphereCount = generateSphere(3.5, 40);
 
 	// Create and initialize any buffer objects
 	glBindVertexArray( vao[CLOUDS_VAO] );
@@ -577,6 +579,8 @@ void init() {
 	cloudsTexture = glGetUniformLocation(program, "cloudsTexture");
 	glUniform1i(cloudsTexture, 3); // assign this one to texture unit 2
 
+	
+
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
 	vPosition = glGetAttribLocation(program, "vPosition");
 	glEnableVertexAttribArray(vPosition);
@@ -587,7 +591,9 @@ void init() {
 	glEnableVertexAttribArray(texCoord);
 	glVertexAttribPointer(texCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-
+	glUseProgram(cloudsShader);
+	cloudsTexture = glGetUniformLocation(cloudsShader, "cloudsTexture");
+	glUniform1i(cloudsTexture, 3); // assign this one to texture unit 2
 	
 	setupShader(program);
 
