@@ -133,11 +133,16 @@ int prevMouseY;
 double view_rotx = 0.0;
 double view_roty = 0.0;
 double view_rotz = 0.0;
+double clouds_view_rotx = 0.0;
+double clouds_view_roty = 0.0;
+double clouds_view_rotz = 0.0;
 double globe_revolution = 0.0;
+double cloud_revolution = 0.0;
 double z_distance;
 
 //our modelview and perspective matrices
 mat4 mv, p;
+mat4 mvClouds;
 
 vec4* sphere_verts;
 vec3* sphere_normals;
@@ -235,12 +240,13 @@ void display(void)
 	glUniform4fv(light_position, 1, mv*vec4(90, 290, 90, 1));
 	glUniform4fv(light_color, 1, vec4(1,1,1,1));
 	glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
-
+	mvClouds = mv;
 	mv = mv * RotateZ(globe_revolution);
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 
 	if(mode == 0){
 		setupShader(program);
+		glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
 		glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
 		glVertexAttrib1f(vSpecularExponent, 10.0);
@@ -264,10 +270,15 @@ void display(void)
 		glBindVertexArray( vao[0] );
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
 
-		mv = LookAt(vec4(0, 0, 10+z_distance, 1.0), vec4(0, 0, 0, 1.0), vec4(0, 1, 0, 0.0));
+		//mv = LookAt(vec4(0, 0, 10+z_distance, 1.0), vec4(0, 0, 0, 1.0), vec4(0, 1, 0, 0.0));
 
-	mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
+	//mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
 		setupCloudShader(cloudsShader);
+		mv = mvClouds;
+		mv = mv * RotateZ(cloud_revolution);
+		//p = Perspective(45.0, (float)width/(float)height, 1.0, 100.0);
+		glUniformMatrix4fv(projection, 1, GL_TRUE, p);
+		glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 		//glUseProgram(cloudsShader);
 		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
 		glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
@@ -467,7 +478,7 @@ void init() {
 
 	/* CLOUDS SPHERE */
 	//populate our arrays
-	cloudSphereCount = generateSphere(3.5, 40);
+	cloudSphereCount = generateSphere(3.02, 40);
 
 	// Create and initialize any buffer objects
 	glBindVertexArray( vao[CLOUDS_VAO] );
@@ -601,7 +612,8 @@ void init() {
 
 void my_timer (int v)
 {
-	globe_revolution+=0.3;
+	globe_revolution+=0.15;
+	cloud_revolution+=0.08;
 	glutPostRedisplay();
 	glutTimerFunc(1000/v, my_timer, v);
 }
