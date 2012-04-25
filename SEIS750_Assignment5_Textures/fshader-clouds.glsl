@@ -64,16 +64,16 @@ void main()
 	}
 		
 	vec4 amb = AmbientDiffuseColor * ambient_light;	
-	vec4 diff = max(dot(L,N), 0.0) * AmbientDiffuseColor * light_color;
+	vec4 diff = max(dot(L,N), 0.0) * texture2D(cloudsTexture, fTexCoord) * light_color;
 	vec4 spec = pow( max (dot(N,H), 0.0), SpecularExponent) *  SpecularColor * light_color;
 	if(dot(L,N) < 0.0){
 		spec = vec4(0,0,0,1);
 	}
 	//fColor = amb + diff + spec;
 	//fColor.w = 1.0;
-
-	fColor = texture2D(cloudsTexture, fTexCoord);
-	//fColor.w = 1.0;
+	//fColor = vec4(0.5,0.5,0.5,0.5);
+	fColor = diff;//texture2D(cloudsTexture, fTexCoord);
+	fColor.w = (texture2D(cloudsTexture, fTexCoord).w);
 	//fColor = vec4( vN, 1);
 		
 	//fColor = AmbientDiffuseColor;

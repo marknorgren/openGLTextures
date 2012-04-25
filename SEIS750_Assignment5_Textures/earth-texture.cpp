@@ -22,6 +22,8 @@ int ww=800, wh=800;
 GLuint program, program1, program2, program3;
 GLuint cloudsShader;
 
+bool showClouds = true;
+
 // Texture Files
 enum textureNames {
 	EARTH_TEXTURE,
@@ -241,20 +243,26 @@ void display(void)
 	glUniform4fv(light_color, 1, vec4(1,1,1,1));
 	glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
 	mvClouds = mv;
+	p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+	glUniformMatrix4fv(projection, 1, GL_TRUE, p);
+	//earth rotation
+	vec4 lightPos_mv = mv*vec4(90, 290, 90, 1);
 	mv = mv * RotateZ(globe_revolution);
 	glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
-
+	
 	if(mode == 0){
 		setupShader(program);
+		p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+		glUniformMatrix4fv(projection, 1, GL_TRUE, p);
 		glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
 		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
 		glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
 		glVertexAttrib1f(vSpecularExponent, 10.0);
-		vec4 lightPos_mv = mv*vec4(90, 290, 90, 1);
+		
 		glUniform4fv(light_position, 1, lightPos_mv);
 		glUniform4fv(light_color, 1, vec4(1,1,1,1));
 		glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
-		
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texName[0]);
 
@@ -266,41 +274,44 @@ void display(void)
 
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, texName[CLOUDS_TEXTURE]);
-		
+
 		glBindVertexArray( vao[0] );
 		glDrawArrays( GL_TRIANGLES, 0, spherevertcount );    // draw the sphere 
 
 		//mv = LookAt(vec4(0, 0, 10+z_distance, 1.0), vec4(0, 0, 0, 1.0), vec4(0, 1, 0, 0.0));
 
-	//mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
-		setupCloudShader(cloudsShader);
-		mv = mvClouds;
-		mv = mv * RotateZ(cloud_revolution);
-		//p = Perspective(45.0, (float)width/(float)height, 1.0, 100.0);
-		glUniformMatrix4fv(projection, 1, GL_TRUE, p);
-		glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
-		//glUseProgram(cloudsShader);
-		glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
-		glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
-		glVertexAttrib1f(vSpecularExponent, 10.0);
-		glUniform4fv(light_position, 1, lightPos_mv);
-		glUniform4fv(light_color, 1, vec4(1,1,1,1));
-		glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
-		
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texName[0]);
+		//mv = mv * RotateX(view_rotx) * RotateY(view_roty) * RotateZ(view_rotz);
+		if(showClouds)
+		{
+			setupCloudShader(cloudsShader);
+			mv = mvClouds;
+			mv = mv * RotateZ(cloud_revolution);
+			p = Perspective(45.0, (float)ww/(float)wh, 1.0, 100.0);
+			glUniformMatrix4fv(projection, 1, GL_TRUE, p);
+			glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
+			//glUseProgram(cloudsShader);
+			glVertexAttrib4fv(vAmbientDiffuseColor, vec4(.5, 0, 0, 1));
+			glVertexAttrib4fv(vSpecularColor, vec4(1.0f,1.0f,1.0f,1.0f));
+			glVertexAttrib1f(vSpecularExponent, 10.0);
+			glUniform4fv(light_position, 1, lightPos_mv);
+			glUniform4fv(light_color, 1, vec4(1,1,1,1));
+			glUniform4fv(ambient_light, 1, vec4(.7, .7, .7, 5));
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texName[1]);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texName[0]);
 
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, texName[2]);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, texName[1]);
 
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, texName[CLOUDS_TEXTURE]);
-		
-		glBindVertexArray( vao[CLOUDS_VAO] );
-		glDrawArrays( GL_TRIANGLES, 0, cloudSphereCount );    // draw the sphere 
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, texName[2]);
+
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, texName[CLOUDS_TEXTURE]);
+
+			glBindVertexArray( vao[CLOUDS_VAO] );
+			glDrawArrays( GL_TRIANGLES, 0, cloudSphereCount );    // draw the sphere 
+		}
 
 	}else{
 		glBindVertexArray(0);
@@ -389,7 +400,7 @@ void Keyboard(unsigned char key, int x, int y) {
 		setupShader(program2);
 	}
 	if (key == 'c'){
-		setupShader(program3);
+		showClouds ? showClouds=false : showClouds=true;
 	}
 	if (key == 's'){
 		mode = 0;
@@ -443,7 +454,7 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void init() {
-
+	glEnable(GL_CULL_FACE);
 	/*select clearing (background) color*/
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glEnable(GL_DEPTH_TEST);
@@ -457,7 +468,7 @@ void init() {
 	glUseProgram(program );
 
 	//populate our arrays
-	spherevertcount = generateSphere(3, 40);
+	spherevertcount = generateSphere(3, 80);
 
 	// Create a vertex array object
 	glGenVertexArrays( NUMBER_OF_VAOS, vao );
@@ -478,7 +489,7 @@ void init() {
 
 	/* CLOUDS SPHERE */
 	//populate our arrays
-	cloudSphereCount = generateSphere(3.02, 40);
+	cloudSphereCount = generateSphere(3.02, 80);
 
 	// Create and initialize any buffer objects
 	glBindVertexArray( vao[CLOUDS_VAO] );
@@ -590,7 +601,7 @@ void init() {
 	cloudsTexture = glGetUniformLocation(program, "cloudsTexture");
 	glUniform1i(cloudsTexture, 3); // assign this one to texture unit 2
 
-	
+
 
 	glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
 	vPosition = glGetAttribLocation(program, "vPosition");
@@ -605,15 +616,15 @@ void init() {
 	glUseProgram(cloudsShader);
 	cloudsTexture = glGetUniformLocation(cloudsShader, "cloudsTexture");
 	glUniform1i(cloudsTexture, 3); // assign this one to texture unit 2
-	
+
 	setupShader(program);
 
 }
 
 void my_timer (int v)
 {
-	globe_revolution+=0.15;
-	cloud_revolution+=0.08;
+	globe_revolution-=0.15;
+	cloud_revolution-=0.08;
 	glutPostRedisplay();
 	glutTimerFunc(1000/v, my_timer, v);
 }
