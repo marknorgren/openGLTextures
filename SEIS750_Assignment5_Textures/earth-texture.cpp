@@ -20,7 +20,7 @@ int ww=800, wh=800;
 
 #define M_PI 3.14159265358979323846
 
-GLuint program, specOnlyShader, program2, program3;
+GLuint program, specOnlyShader;
 GLuint cloudsShader;
 
 bool showClouds = true;
