@@ -60,6 +60,6 @@ void main()
 	if(dot(L,N) < 0.0){
 		spec = vec4(0,0,0,1);
 	}
-	fColor = amb + diff + spec;
+	fColor = SpecularColor;//AmbientDiffuseColor;//amb + diff + spec;
 	fColor.w = 1.0;
 }
