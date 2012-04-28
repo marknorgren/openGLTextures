@@ -62,6 +62,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="fshader-clouds.glsl" />
+    <None Include="fshader-specMapOnly.glsl" />
     <None Include="fshader-texture.glsl" />
     <None Include="vshader-texture.glsl" />
   </ItemGroup>
