@@ -1,7 +1,5 @@
 #version 150
-//You need the texture coordinates to be passed in from the vertex shader (interpolated)
 in vec2 fTexCoord;
-//You also need your uniform sampler so you can use those coordinates to look up a texel
 
 in vec3 position;
 in vec3 vN;
@@ -13,7 +11,6 @@ uniform vec4 ambient_light;
 uniform sampler2D texture;
 uniform sampler2D specMapTexture;
 uniform sampler2D nightMapTexture;
-uniform sampler2D cloudsTexture;
 
 out vec4  fColor;
 
@@ -22,9 +19,6 @@ void main()
 	vec4 AmbientDiffuseColor;
 	vec4 SpecularColor;
 	float SpecularExponent;
-
-	//you need to look up the appropriate color for this fragment based on the texture map and the texture cordinates
-
 
 	SpecularColor = texture2D(specMapTexture, fTexCoord);
 	SpecularExponent = SpecularColor.w*900;
@@ -39,7 +33,6 @@ void main()
 	if(dayNightDiff < 0){
 			AmbientDiffuseColor = texture2D(nightMapTexture, fTexCoord);
 			AmbientDiffuseColor.w = 1.0;
-			//amb = AmbientDiffuseColor * ambient_light;
 		}
 	else if(dayNightDiff > 0) {
 			AmbientDiffuseColor = texture2D(texture, fTexCoord);
@@ -53,8 +46,6 @@ void main()
 		
 		dayAmount = 1.25*(dayNightDiff+.4);
 		nightAmount = 1-dayAmount;
-		//nightAmount = 1.25*(dayNightDiff+.4);
-		//dayAmount = 1-nightAmount;
 		
 		night = vec4((nightAmount * (texture2D(nightMapTexture, fTexCoord)).xyz), 1.0);
 		day = vec4((dayAmount * (texture2D(texture, fTexCoord)).xyz), 1.0);
@@ -71,12 +62,4 @@ void main()
 	}
 	fColor = amb + diff + spec;
 	fColor.w = 1.0;
-
-	//fColor = texture2D(cloudsTexture, fTexCoord);
-	//fColor.w = 0.0;
-	//fColor = vec4( vN, 1);
-		
-	//fColor = AmbientDiffuseColor;
-	//fColor = spec;
-
 }
